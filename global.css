@@ -1,0 +1,73 @@
+import React, { useEffect, useState } from "react";
+
+export default function Dashboard() {
+  const [history, setHistory] = useState([]);
+  const [stats, setStats] = useState({ total: 0, fake: 0, real: 0 });
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("newsHistory")) || [];
+    setHistory(stored);
+
+    let fake = 0;
+    let real = 0;
+
+    stored.forEach((item) => {
+      if (item.label === "Fake") fake++;
+      else real++;
+    });
+
+    setStats({ total: stored.length, fake, real });
+  }, []);
+
+  return (
+    <div className="dashboard">
+      <h1 className="title">📊 Analytics Dashboard</h1>
+
+      {/* Stats */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <h2>{stats.total}</h2>
+          <p>Total Analyzed</p>
+        </div>
+
+        <div className="stat-card fake">
+          <h2>{stats.fake}</h2>
+          <p>Fake News</p>
+        </div>
+
+        <div className="stat-card real">
+          <h2>{stats.real}</h2>
+          <p>Real News</p>
+        </div>
+      </div>
+
+      {/* History */}
+      <div className="history-section">
+        <h2>Recent Activity</h2>
+
+        {history.length === 0 ? (
+          <p className="empty">No data yet</p>
+        ) : (
+          history.map((item, index) => (
+            <div key={index} className="history-card">
+              <div className="history-top">
+                <span className={`badge ${item.label.toLowerCase()}`}>
+                  {item.label}
+                </span>
+                <span className="confidence">
+                  {item.confidence}%
+                </span>
+              </div>
+
+              <p className="text">
+                {item.text.length > 150
+                  ? item.text.slice(0, 150) + "..."
+                  : item.text}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
